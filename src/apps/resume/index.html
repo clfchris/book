@@ -33,6 +33,10 @@
         <ul class="collection" id="jobs">
         </ul>
 
+	<h2>Favorite Cities</h2>
+	<ul class="collection" id="cities">
+	</ul>
+
       </div>
 
       <script>
@@ -51,6 +55,12 @@
           var jobs = snapshot.val()
           jobs.forEach(function(job){
             $('#jobs').append('<li class="collection-item">' + job + '</li>')
+          })
+        })
+	ref.child('cities').on('value', function(snapshot){
+          var cities = snapshot.val()
+          cities.forEach(function(city){
+            $('#cities').append('<li class="collection-item">' + city + '</li>')
           })
         })
       </script>
