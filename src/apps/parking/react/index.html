@@ -50,12 +50,16 @@
 
       // data about the team
       // TODO: add more attributes (lastname, github repo link)
-      var members = [{name: 'John'}, {name: 'Mary'}]
-
+      var members = [ {name: 'Callan Fisher', github: 'https://github.com/CallanFisher'}, 
+                      {name: 'Paige Jonhson', github: 'https://github.com/Paigej'}, 
+                      {name: 'Zhongzhi Zhang', github: 'https://github.com/ZhongzhiZhang'}, 
+                      {name: 'Chris Fanning', github: 'https://github.com/clfchris'}]
+     
       ReactDOM.render(
         <MyComponents.Team members={members}/>,
         $('#team').get(0)
       );
+
 
       var garage = {name: 'something'}
 
