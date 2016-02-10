@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <title>My Resume in ReactJS</title>
+    <title>Chris Fanning Resume in ReactJS</title>
 
     <!--Import Google Icon Font-->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -44,10 +44,16 @@
     <script type="text/babel" src="components/task-list.js"></script>
     <script type="text/babel" src="components/city-list.js"></script>
     <script type="text/babel" src="components/skill-list.js"></script>
-
+     <script src="https://cdn.firebase.com/js/client/2.3.2/firebase.js"></script>
+    <!-- NEED THIS^ -->
     <!-- render react components -->
     <script type="text/babel">
-
+		
+    //firebase references
+    var weather= new Firebase('https://publicdata-weather.firebaseio.com')
+    var resume = new Firebase('https://sweltering-torch-7007.firebaseio.com/')
+    var trumplove = new Firebase('https://trumplove.firebaseio.com')
+      
       ReactDOM.render(
         <MyComponents.NavBar/>,
         $('#navbar').get(0)
@@ -57,32 +63,49 @@
         <MyComponents.About/>,
         $('#about').get(0)
       );
-
-      // TODO: load tasks data from Firebase
-      var tasks = [{name: 'go to the movies'}, {name: 'sleep'}]
+      
+      var tasks = []
+      trumplove.child('todos/').on('value', function(snapshot){
+          var mytasks = snapshot.val()
+          $('#tasks').empty()
+          for( var key in mytasks){ 
+            var curTask = mytasks[key];
+            if (curTask.assigned == "clfchris"){tasks.push(curTask)
+            }
+          }
 
       ReactDOM.render(
         <MyComponents.TaskList tasks={tasks}/>,
         $('#tasks').get(0)
       );
+  })
 
-      // TODO: load city weather data from Firebase
-      var cities = [{name: 'Boulder'}, {name: 'Chandler'}]
-
+      weather.on('value', function(snapshot){
+        var city = snapshot.val()
+        var cities = []
+        $('#cities').empty()  
+        for( var key in city){
+          if (key == "Denver" || key == "Boulder" || key == "Chandler" || key == "Anderson" || key == "Charleston"){ 
+            var curCity = city[key]
+            curCity.name = key
+            cities.push(curCity)
+          }
+        }
+      
       ReactDOM.render(
         <MyComponents.CityList cities={cities}/>,
         $('#cities').get(0)
       );
+  })
 
-
-      // TODO: load skill data from Firebase
-      var skills = [{name: 'JavaScript', years: 5}, {name: 'Karate', years: 2}]
+     resume.child('Skills').on('value', function(snapshot){
+          var skills = snapshot.val()
 
       ReactDOM.render(
         <MyComponents.SkillList skills={skills}/>,
         $('#skills').get(0)
       );
-
+})
     </script>
   </body>
 </html>
