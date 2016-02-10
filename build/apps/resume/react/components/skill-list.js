@@ -19,9 +19,8 @@ MyComponents.SkillList = React.createClass({
       <div className="card red darken-4">
         <div className="card-content white-text">
         <span class="card-title"> Skills </span>
-        <ul>
-          {skillElements}
-        </ul>
+        {this.props.skills.length}
+        {skillElements}
         </div>
       </div>
     );

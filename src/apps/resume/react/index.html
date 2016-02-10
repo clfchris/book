@@ -85,7 +85,7 @@
         var cities = []
         $('#cities').empty()  
         for( var key in city){
-          if (key == "Denver" || key == "Boulder" || key == "Chandler" || key == "Anderson" || key == "Charleston"){ 
+          if (key == "denver" || key == "boulder" || key == "chandler" || key == "anderson" || key == "charleston"){ 
             var curCity = city[key]
             curCity.name = key
             cities.push(curCity)
@@ -97,9 +97,12 @@
         $('#cities').get(0)
       );
   })
-
-     resume.child('Skills').on('value', function(snapshot){
-          var skills = snapshot.val()
+     var skills = []
+     resume.child('Skills/').once('value', function(skillList){
+		 skillList.forEach(function(skill){
+			 var key = skill.key()
+			 skills.push({name: key})
+			 })
 
       ReactDOM.render(
         <MyComponents.SkillList skills={skills}/>,

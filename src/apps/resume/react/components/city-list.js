@@ -23,7 +23,7 @@ MyComponents.City = React.createClass({
       );
     }
 });
-MyComponents.CityList = React.createClass({
+MyComponents.City = React.createClass({
   render: function() {
 
     var cityElements = this.props.cities.map(function(c,i){
