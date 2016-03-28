@@ -3,9 +3,9 @@ var data = {
   user: null,
   drivers: [],
   riders: [],
-  providers: [],
-  center: [9.73, -104.98]
-}
+  center: [39.73, -104.98]
+};
+var root = new Firebase('https://rideski.firebaseio.com/');
 
 // a single 'handlers' object that holds all the actions of your entire app
 var actions = {}
@@ -14,21 +14,45 @@ var actions = {}
 // needs to to re-rendered
 // 'data' and 'actions' are injected into the app
 function render(){
-  ReactDOM.render(
-    <MyComponents.App
-        data={data}
-        actions={actions}/>,
-    $('#app-container').get(0)
-  )
+  var user = getURLParameter('user');
+  if (user !== "" && data.user === null) {
+    root.child('users').child(user).once('value', function(snapshot) {
+      data.user = snapshot.val();
+      ReactDOM.render(
+        <MyComponents.App
+            data={data}
+            actions={actions}/>,
+        $('#app-container').get(0)
+      );
+    });
+  }
+  else {
+    ReactDOM.render(
+      <MyComponents.App
+          data={data}
+          actions={actions}/>,
+      $('#app-container').get(0)
+    );
+  }
 }
 
 render();
 
+function getURLParameter(sParam) {
+  var sPageURL = window.location.search.substring(1);
+  var sURLVariables = sPageURL.split('&');
+  for (var i = 0; i < sURLVariables.length; i++) {
+    var sParameterName = sURLVariables[i].split('=');
+    if (sParameterName[0] == sParam) {
+      return sParameterName[1];
+    }
+  }
+  return "";
+}
+
 //
 // DATA
 //
-  
-var root = new Firebase('https://rideski.firebaseio.com/');
 var driverRef = root.child('Drivers');
 driverRef.on('value', function(snapshot) {
   data.drivers = snapshot.val();
@@ -41,35 +65,24 @@ riderRef.on('value', function(snapshot) {
   render();
 });
 
-var firebaseRef = new Firebase('https://ucdd2-book.firebaseio.com/uber')
-
-// Real-time Data (load constantly on changes)
-firebaseRef.child('providers')
-  .on('value', function(snapshot){
-    data.providers = _.values(snapshot.val())
-    render();
-  });
-
-
 //
 // ACTIONS
 //
 
 // Actions
 actions.setUserLocation = function(latlng){
-
   if (data.user){
-    firebaseRef
+    root
       .child('users')
       .child(data.user.username)
       .child('pos')
-      .set([latlng.lat, latlng.lng])
+      .set([latlng.lat, latlng.lng]);
   }
 }
 
 actions.login = function(){
 
-  firebaseRef.authWithOAuthPopup("github", function(error, authData){
+  root.authWithOAuthPopup("github", function(error, authData){
 
     // handle the result of the authentication
     if (error) {
@@ -82,20 +95,21 @@ actions.login = function(){
         displayName: authData.github.displayName,
         username: authData.github.username,
         id: authData.github.id,
+        imgUrl: authData.github.profileImageURL,
         status: 'online',
         pos: data.center  // position, default to the map center
-      }
+      };
 
-      var userRef = firebaseRef.child('users').child(user.username)
+      var userRef = root.child('users').child(user.username);
 
       // subscribe to the user data
       userRef.on('value', function(snapshot){
-        data.user = snapshot.val()
-        render()
-      })
+        data.user = snapshot.val();
+        render();
+      });
 
       // set the user data
-      userRef.set(user)
+      userRef.set(user);
 
     }
   })
@@ -106,21 +120,21 @@ actions.logout = function(){
 
   if (data.user){
 
-    firebaseRef.unauth()
+    root.unauth();
 
-    var userRef = firebaseRef
+    var userRef = root
       .child('users')
-      .child(data.user.username)
+      .child(data.user.username);
 
     // unsubscribe to the user data
-    userRef.off()
+    userRef.off();
 
     // set the user's status to offline
-    userRef.child('status').set('offline')
+    userRef.child('status').set('offline');
 
-    data.user = null
+    data.user = null;
 
-    render()
+    render();
 
   }
 
